@@ -117,6 +117,7 @@ class UploadCarrierTracking(models.TransientModel):
                 import_data.append(row_dict)
             # Browse result and update the tracking reference on stock.picking model.
             data_list = []
+            email_to_send = ''
             for row in import_data:
                 tracking_ref_status = ''
                 if row['REFERENCIA'] != 'CANCELADO':
@@ -127,8 +128,10 @@ class UploadCarrierTracking(models.TransientModel):
                             tracking_ref = 'EMBARCADO EL %s CON NO. GUIA %s' % (
                                 row['F.DOC'], row['TALON'])
                             StockPicking_id.write(
-                                {'carrier_tracking_ref': tracking_ref})
+                                {'carrier_tracking_ref': tracking_ref},
+                                {'box': row['BULTOS'}])
                             tracking_ref_status = 'OK'
+                            email_to_send = StockPicking_id.partner_id.email
                             send_tracking_ref(StockPicking_id.id)
                         else:
                             tracking_ref_status = 'Se encontraron multiples vales de entrega'
@@ -139,13 +142,14 @@ class UploadCarrierTracking(models.TransientModel):
                 data = (
                     row['TALON'],
                     row['OBSERVACION 1'],
-                    tracking_ref_status)
+                    tracking_ref_status,
+                    email_to_send)
                 data_list.append(data)
             handle, fn = tempfile.mkstemp(suffix='.csv')
             with os.fdopen(handle, "w", encoding='utf-8', errors='surrogateescape', newline='') as f:
                 writer = csv.writer(
                     f, delimiter=';', quoting=csv.QUOTE_MINIMAL)
-                writer.writerow(['GUIA', 'REFERENCIA', 'STATUS'])
+                writer.writerow(['GUIA', 'REFERENCIA', 'STATUS', 'EMAIL'])
                 try:
                     writer.writerows(data_list)
                 except Exception as e:
