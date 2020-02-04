@@ -117,19 +117,19 @@ class UploadCarrierTracking(models.TransientModel):
                 import_data.append(row_dict)
             # Browse result and update the tracking reference on stock.picking model.
             data_list = []
-            email_to_send = ''
             for row in import_data:
                 tracking_ref_status = ''
                 if row['REFERENCIA'] != 'CANCELADO':
                     StockPicking_id = self.env['stock.picking'].search(
                         [('origin', '=', row['OBSERVACION 1'])])
                     if StockPicking_id:
+                        email_to_send = ''
                         if len(StockPicking_id) == 1:
                             tracking_ref = 'EMBARCADO EL %s CON NO. GUIA %s' % (
                                 row['F.DOC'], row['TALON'])
                             StockPicking_id.write(
                                 {'carrier_tracking_ref': tracking_ref},
-                                {'box': row['BULTOS'}])
+                                {'box': row['BULTOS']})
                             tracking_ref_status = 'OK'
                             email_to_send = StockPicking_id.partner_id.email
                             send_tracking_ref(StockPicking_id.id)
