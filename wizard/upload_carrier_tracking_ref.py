@@ -127,9 +127,10 @@ class UploadCarrierTracking(models.TransientModel):
                         if len(StockPicking_id) == 1:
                             tracking_ref = 'EMBARCADO EL %s CON NO. GUIA %s' % (
                                 row['F.DOC'], row['TALON'])
-                            StockPicking_id.write(
-                                {'carrier_tracking_ref': tracking_ref},
-                                {'box': row['BULTOS']})
+                            StockPicking_id.write({
+                                'carrier_tracking_ref': tracking_ref,
+                                'box': row['BULTOS']
+                            })
                             tracking_ref_status = 'OK'
                             email_to_send = StockPicking_id.partner_id.email
                             send_tracking_ref(StockPicking_id.id)
