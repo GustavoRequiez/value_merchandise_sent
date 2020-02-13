@@ -58,12 +58,16 @@ class ValueMerchandiseSent(models.TransientModel):
                 pname = picking.partner_id.parent_name
             else:
                 pname = picking.partner_id.name
+            currency = self.env['sale.order'].search(
+                'id', '=', picking.sale_id).currency_id.name
+
             data = (
                 picking.origin,
                 picking.name,
                 pname,
                 picking.carrier_id.name,
                 merchandise_value,
+                currency,
                 tracking_ref)
             data_list.append(data)
 
@@ -72,7 +76,7 @@ class ValueMerchandiseSent(models.TransientModel):
             writer = csv.writer(
                 f, delimiter=';', quoting=csv.QUOTE_MINIMAL)  # , quotechar='|'
             writer.writerow(['PEDIDO', 'VALE DE ENTRAGA',
-                             'CLIENTE', 'TRANSPORTE', 'VALOR', 'GUIA', ])
+                             'CLIENTE', 'TRANSPORTE', 'VALOR', 'MONEDA', 'GUIA', ])
             try:
                 writer.writerows(data_list)
             except Exception as e:
