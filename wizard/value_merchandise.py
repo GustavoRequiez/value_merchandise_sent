@@ -58,8 +58,9 @@ class ValueMerchandiseSent(models.TransientModel):
                 pname = picking.partner_id.parent_name
             else:
                 pname = picking.partner_id.name
-            sale_id = self.env['sale.order'].search('id', '=', picking.sale_id)
-            currency = sale_id.currency_id.name
+            # sale_id = self.env['sale.order'].search([('id', '=', picking.sale_id)])
+            currency = self.env['sale.order'].search(
+                [('id', '=', picking.sale_id)]).currency_id.name
             data = (
                 picking.origin,
                 picking.name,
