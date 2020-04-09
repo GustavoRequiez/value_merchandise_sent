@@ -17,7 +17,7 @@ _logger = logging.getLogger(__name__)
 
 class UploadCarrierTracking(models.TransientModel):
     _name = 'upload.carrier.tracking'
-    _desciprion = 'Mass reference load of tracking guides'
+    _description = 'Mass reference load of tracking guides'
 
     name = fields.Char('File Name', default='status.csv')
     data_file = fields.Binary('File')
